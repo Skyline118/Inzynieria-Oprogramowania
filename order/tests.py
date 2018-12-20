@@ -1,6 +1,6 @@
 from django.test import TestCase
 from order.forms import MyForm
-from order.models import Courier, EnvelopePricing
+from order.models import Courier, EnvelopePricing, PackPricing, PalletPricing
 from django.urls import reverse
 
 
@@ -53,3 +53,32 @@ class UrlsTest(TestCase):
     def test_made_up_page(self):
         response = self.client.get('/order/made_up_url.html')
         self.assertEqual(404,response.status_code)
+class EnvelopePricingTest(TestCase):
+    def setUp(self):
+        Courier.objects.create(name='UPC')
+        courier = Courier.objects.get(pk=1)
+        EnvelopePricing.objects.create(courier=courier,up_to_1=1.0)
+    def test_envelope_pricing_content(self):
+        envelope = EnvelopePricing.objects.get(pk=1)
+        expected_price = envelope.up_to_1
+        self.assertEqual(expected_price, 1.0)
+
+class PalletPricingTest(TestCase):
+    def setUp(self):
+        Courier.objects.create(name='UPC')
+        courier = Courier.objects.get(pk=1)
+        PalletPricing.objects.create(courier=courier, up_to_300=300.0, up_to_500=500.0, up_to_800=800.0, up_to_1000=1000.0)
+    def test_pallet_pricing_content(self):
+        pallet = PalletPricing.objects.get(pk=1)
+        expected_price = pallet.up_to_300
+        self.assertEqual(expected_price, 300.0)
+
+class PackPricingTest(TestCase):
+    def setUp(self):
+        Courier.objects.create(name='UPC')
+        courier = Courier.objects.get(pk=1)
+        PackPricing.objects.create(courier=courier, up_to_1=1.0, up_to_2=2.0, up_to_5=5.0, up_to_10=10.0, up_to_15=15.0, up_to_20=20.0, up_to_30=30.0)
+    def test_pack_pricing_content(self):
+        pack = PackPricing.objects.get(pk=1)
+        expected_price = pack.up_to_1
+        self.assertEqual(expected_price, 1.0)
